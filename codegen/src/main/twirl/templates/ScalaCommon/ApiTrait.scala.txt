@@ -7,13 +7,9 @@
 @akka.grpc.gen.Constants.DoNotEditComment
 package @service.packageName
 
-import akka.annotation.ApiMayChange
-
-import akka.grpc.AkkaGrpcGenerated
-
 @for(comment <- service.comment) {/**
 @{java.util.regex.Pattern.compile("^\\s?(.*)$", java.util.regex.Pattern.MULTILINE).matcher(comment).replaceAll(" * $1")} */}
-@@AkkaGrpcGenerated
+@@akka.grpc.AkkaGrpcGenerated
 trait @{service.name} {
   @for(method <- service.methods) {
   @for(comment <- method.comment) {/**
@@ -29,7 +25,7 @@ trait @{service.name} {
   @if(methodType == akka.grpc.gen.BidiStreaming) {MethodDescriptor.MethodType.BIDI_STREAMING }
 }
 
-@@AkkaGrpcGenerated
+@@akka.grpc.AkkaGrpcGenerated
 object @{service.name} extends akka.grpc.ServiceDescription {
   val name = "@service.grpcName"
 
@@ -43,8 +39,8 @@ object @{service.name} extends akka.grpc.ServiceDescription {
     }
   }
 
-  @@ApiMayChange
-  @@AkkaGrpcGenerated
+  @@akka.annotation.ApiMayChange
+  @@akka.grpc.AkkaGrpcGenerated
   object MethodDescriptors {
     import akka.grpc.internal.Marshaller
     import io.grpc.MethodDescriptor

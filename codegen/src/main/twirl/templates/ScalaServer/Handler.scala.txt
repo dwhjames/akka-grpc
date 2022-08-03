@@ -7,21 +7,6 @@
 @akka.grpc.gen.Constants.DoNotEditComment
 package @service.packageName
 
-import scala.concurrent.ExecutionContext
-
-import akka.grpc.scaladsl.{ GrpcExceptionHandler, GrpcMarshalling }
-import akka.grpc.Trailers
-
-import akka.actor.ActorSystem
-import akka.actor.ClassicActorSystemProvider
-import akka.annotation.ApiMayChange
-import akka.http.scaladsl.model
-import akka.stream.SystemMaterializer
-
-import akka.grpc.internal.TelemetryExtension
-
-import akka.grpc.AkkaGrpcGenerated
-
 @{if (powerApis) "import akka.grpc.scaladsl.MetadataBuilder" else ""}
 
 @defining(if (powerApis) service.name + "PowerApi" else service.name) { serviceName =>
@@ -31,11 +16,11 @@ import akka.grpc.AkkaGrpcGenerated
  * The API of this class may still change in future Akka gRPC versions, see for instance
  * https://github.com/akka/akka-grpc/issues/994
  */
-@@ApiMayChange
-@@AkkaGrpcGenerated
+@@akka.annotation.ApiMayChange
+@@akka.grpc.AkkaGrpcGenerated
 object @{serviceName}Handler {
-    private val notFound = scala.concurrent.Future.successful(model.HttpResponse(model.StatusCodes.NotFound))
-    private val unsupportedMediaType = scala.concurrent.Future.successful(model.HttpResponse(model.StatusCodes.UnsupportedMediaType))
+    private val notFound = scala.concurrent.Future.successful(akka.http.scaladsl.model.HttpResponse(akka.http.scaladsl.model.StatusCodes.NotFound))
+    private val unsupportedMediaType = scala.concurrent.Future.successful(akka.http.scaladsl.model.HttpResponse(akka.http.scaladsl.model.StatusCodes.UnsupportedMediaType))
 
     /**
      * Creates a `HttpRequest` to `HttpResponse` handler that can be used in for example `Http().bindAndHandleAsync`
@@ -44,7 +29,7 @@ object @{serviceName}Handler {
      * Use `akka.grpc.scaladsl.ServiceHandler.concatOrNotFound` with `@{service.name}Handler.partial` when combining
      * several services.
      */
-    def apply(implementation: @serviceName)(implicit system: ClassicActorSystemProvider): model.HttpRequest => scala.concurrent.Future[model.HttpResponse] =
+    def apply(implementation: @serviceName)(implicit system: akka.actor.ClassicActorSystemProvider): akka.http.scaladsl.model.HttpRequest => scala.concurrent.Future[akka.http.scaladsl.model.HttpResponse] =
       partial(implementation).orElse { case _ => notFound }
 
     /**
@@ -54,7 +39,7 @@ object @{serviceName}Handler {
      * Use `akka.grpc.scaladsl.ServiceHandler.concatOrNotFound` with `@{service.name}Handler.partial` when combining
      * several services.
      */
-    def apply(implementation: @serviceName, eHandler: ActorSystem => PartialFunction[Throwable, Trailers])(implicit system: ClassicActorSystemProvider): model.HttpRequest => scala.concurrent.Future[model.HttpResponse] =
+    def apply(implementation: @serviceName, eHandler: akka.actor.ActorSystem => PartialFunction[Throwable, akka.grpc.Trailers])(implicit system: akka.actor.ClassicActorSystemProvider): akka.http.scaladsl.model.HttpRequest => scala.concurrent.Future[akka.http.scaladsl.model.HttpResponse] =
       partial(implementation, @{service.name}.name, eHandler).orElse { case _ => notFound }
 
     /**
@@ -66,7 +51,7 @@ object @{serviceName}Handler {
      *
      * Registering a gRPC service under a custom prefix is not widely supported and strongly discouraged by the specification.
      */
-    def apply(implementation: @serviceName, prefix: String)(implicit system: ClassicActorSystemProvider): model.HttpRequest => scala.concurrent.Future[model.HttpResponse] =
+    def apply(implementation: @serviceName, prefix: String)(implicit system: akka.actor.ClassicActorSystemProvider): akka.http.scaladsl.model.HttpRequest => scala.concurrent.Future[akka.http.scaladsl.model.HttpResponse] =
       partial(implementation, prefix).orElse { case _ => notFound }
 
     /**
@@ -78,7 +63,7 @@ object @{serviceName}Handler {
      *
      * Registering a gRPC service under a custom prefix is not widely supported and strongly discouraged by the specification.
      */
-    def apply(implementation: @serviceName, prefix: String, eHandler: ActorSystem => PartialFunction[Throwable, Trailers])(implicit system: ClassicActorSystemProvider): model.HttpRequest => scala.concurrent.Future[model.HttpResponse] =
+    def apply(implementation: @serviceName, prefix: String, eHandler: akka.actor.ActorSystem => PartialFunction[Throwable, akka.grpc.Trailers])(implicit system: akka.actor.ClassicActorSystemProvider): akka.http.scaladsl.model.HttpRequest => scala.concurrent.Future[akka.http.scaladsl.model.HttpResponse] =
       partial(implementation, prefix, eHandler).orElse { case _ => notFound }
 
 @if(serviceName != "ServerReflection") {
@@ -91,7 +76,7 @@ object @{serviceName}Handler {
      * Use `akka.grpc.scaladsl.ServiceHandler.concatOrNotFound` with `@{service.name}Handler.partial` when combining
      * several services.
      */
-    def withServerReflection(implementation: @serviceName)(implicit system: ClassicActorSystemProvider): model.HttpRequest => scala.concurrent.Future[model.HttpResponse] =
+    def withServerReflection(implementation: @serviceName)(implicit system: akka.actor.ClassicActorSystemProvider): akka.http.scaladsl.model.HttpRequest => scala.concurrent.Future[akka.http.scaladsl.model.HttpResponse] =
         akka.grpc.scaladsl.ServiceHandler.concatOrNotFound(
           @{serviceName}Handler.partial(implementation),
           akka.grpc.scaladsl.ServerReflection.partial(List(@{service.name})))
@@ -106,15 +91,15 @@ object @{serviceName}Handler {
      *
      * Registering a gRPC service under a custom prefix is not widely supported and strongly discouraged by the specification.
      */
-    def partial(implementation: @serviceName, prefix: String = @{service.name}.name, eHandler: ActorSystem => PartialFunction[Throwable, Trailers] = GrpcExceptionHandler.defaultMapper)(implicit system: ClassicActorSystemProvider): PartialFunction[model.HttpRequest, scala.concurrent.Future[model.HttpResponse]] = {
-      implicit val mat = SystemMaterializer(system).materializer
-      implicit val ec: ExecutionContext = mat.executionContext
-      val spi = TelemetryExtension(system).spi
+    def partial(implementation: @serviceName, prefix: String = @{service.name}.name, eHandler: akka.actor.ActorSystem => PartialFunction[Throwable, akka.grpc.Trailers] = akka.grpc.scaladsl.GrpcExceptionHandler.defaultMapper)(implicit system: akka.actor.ClassicActorSystemProvider): PartialFunction[akka.http.scaladsl.model.HttpRequest, scala.concurrent.Future[akka.http.scaladsl.model.HttpResponse]] = {
+      implicit val mat = akka.stream.SystemMaterializer(system).materializer
+      implicit val ec: scala.concurrent.ExecutionContext = mat.executionContext
+      val spi = akka.grpc.internal.TelemetryExtension(system).spi
 
       import @{service.name}.Serializers._
 
-      def handle(request: model.HttpRequest, method: String): scala.concurrent.Future[model.HttpResponse] =
-        GrpcMarshalling.negotiated(request, (reader, writer) =>
+      def handle(request: akka.http.scaladsl.model.HttpRequest, method: String): scala.concurrent.Future[akka.http.scaladsl.model.HttpResponse] =
+        akka.grpc.scaladsl.GrpcMarshalling.negotiated(request, (reader, writer) =>
           (method match {
             @for(method <- service.methods) {
             case "@method.grpcName" =>
@@ -125,11 +110,11 @@ object @{serviceName}Handler {
             }
             case m => scala.concurrent.Future.failed(new NotImplementedError(s"Not implemented: $m"))
           })
-          .recoverWith(GrpcExceptionHandler.from(eHandler(system.classicSystem))(system, writer))
+          .recoverWith(akka.grpc.scaladsl.GrpcExceptionHandler.from(eHandler(system.classicSystem))(system, writer))
       ).getOrElse(unsupportedMediaType)
 
-      Function.unlift((req: model.HttpRequest) => req.uri.path match {
-        case model.Uri.Path.Slash(model.Uri.Path.Segment(`prefix`, model.Uri.Path.Slash(model.Uri.Path.Segment(method, model.Uri.Path.Empty)))) =>
+      Function.unlift((req: akka.http.scaladsl.model.HttpRequest) => req.uri.path match {
+        case akka.http.scaladsl.model.Uri.Path.Slash(akka.http.scaladsl.model.Uri.Path.Segment(`prefix`, akka.http.scaladsl.model.Uri.Path.Slash(akka.http.scaladsl.model.Uri.Path.Segment(method, akka.http.scaladsl.model.Uri.Path.Empty)))) =>
           Some(handle(spi.onRequest(prefix, method, req), method))
         case _ =>
           None

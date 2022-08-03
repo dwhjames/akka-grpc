@@ -24,12 +24,12 @@ case class Method(
   def serializer = Serializer(methodDescriptor, outputType)
 
   def unmarshal =
-    if (inputStreaming) "GrpcMarshalling.unmarshalStream"
-    else "GrpcMarshalling.unmarshal"
+    if (inputStreaming) "akka.grpc.scaladsl.GrpcMarshalling.unmarshalStream"
+    else "akka.grpc.scaladsl.GrpcMarshalling.unmarshal"
 
   def marshal =
-    if (outputStreaming) "GrpcMarshalling.marshalStream"
-    else "GrpcMarshalling.marshal"
+    if (outputStreaming) "akka.grpc.scaladsl.GrpcMarshalling.marshalStream"
+    else "akka.grpc.scaladsl.GrpcMarshalling.marshal"
 
   def parameterType =
     if (inputStreaming) s"akka.stream.scaladsl.Source[${messageType(inputType)}, akka.NotUsed]"

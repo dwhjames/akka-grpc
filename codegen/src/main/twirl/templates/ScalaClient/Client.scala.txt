@@ -7,64 +7,35 @@
 @akka.grpc.gen.Constants.DoNotEditComment
 package @service.packageName
 
-import scala.concurrent.ExecutionContext
-
-import akka.actor.ClassicActorSystemProvider
-
-import akka.grpc.GrpcClientSettings
-
-import akka.grpc.scaladsl.AkkaGrpcClient
-
-import akka.grpc.internal.NettyClientUtils
-import akka.grpc.internal.ClientState
-
-import akka.grpc.AkkaGrpcGenerated
-
-@{
-  def withSingleResponse(stmt: String) = Set("import akka.grpc.scaladsl.SingleResponseRequestBuilder", stmt)
-  def withStreamResponse(stmt: String) = Set("import akka.grpc.scaladsl.StreamResponseRequestBuilder", stmt)
-  service.methods.flatMap { method: akka.grpc.gen.scaladsl.Method =>
-
-    val statements = method.methodType match {
-      case akka.grpc.gen.Unary => withSingleResponse("import akka.grpc.internal.ScalaUnaryRequestBuilder")
-      case akka.grpc.gen.ClientStreaming =>  withSingleResponse("import akka.grpc.internal.ScalaClientStreamingRequestBuilder")
-      case akka.grpc.gen.ServerStreaming => withStreamResponse("import akka.grpc.internal.ScalaServerStreamingRequestBuilder")
-      case akka.grpc.gen.BidiStreaming => withStreamResponse("import akka.grpc.internal.ScalaBidirectionalStreamingRequestBuilder")
-    }
-
-    statements
-  }.distinct.mkString("\n")
-}
-
 // Not sealed so users can extend to write their stubs
-@@AkkaGrpcGenerated
-trait @{service.name}Client extends @{service.name} with @{service.name}ClientPowerApi with AkkaGrpcClient
+@@akka.grpc.AkkaGrpcGenerated
+trait @{service.name}Client extends @{service.name} with @{service.name}ClientPowerApi with akka.grpc.scaladsl.AkkaGrpcClient
 
-@@AkkaGrpcGenerated
+@@akka.grpc.AkkaGrpcGenerated
 object @{service.name}Client {
-  def apply(settings: GrpcClientSettings)(implicit sys: ClassicActorSystemProvider): @{service.name}Client =
+  def apply(settings: akka.grpc.GrpcClientSettings)(implicit sys: akka.actor.ClassicActorSystemProvider): @{service.name}Client =
     new Default@{service.name}Client(settings)
 }
 
-@@AkkaGrpcGenerated
-final class Default@{service.name}Client(settings: GrpcClientSettings)(implicit sys: ClassicActorSystemProvider) extends @{service.name}Client {
+@@akka.grpc.AkkaGrpcGenerated
+final class Default@{service.name}Client(settings: akka.grpc.GrpcClientSettings)(implicit sys: akka.actor.ClassicActorSystemProvider) extends @{service.name}Client {
   import @{service.name}.MethodDescriptors._
 
-  private implicit val ex: ExecutionContext = sys.classicSystem.dispatcher
-  private val options = NettyClientUtils.callOptions(settings)
-  private val clientState = new ClientState(settings, akka.event.Logging(sys.classicSystem, classOf[Default@{service.name}Client]))
+  private implicit val ex: scala.concurrent.ExecutionContext = sys.classicSystem.dispatcher
+  private val options = akka.grpc.internal.NettyClientUtils.callOptions(settings)
+  private val clientState = new akka.grpc.internal.ClientState(settings, akka.event.Logging(sys.classicSystem, classOf[Default@{service.name}Client]))
 
   @for(method <- service.methods) {
   private def @{method.name}RequestBuilder(channel: akka.grpc.internal.InternalChannel) =
   @if(method.methodType == akka.grpc.gen.Unary) {
-    new ScalaUnaryRequestBuilder(@{method.name}Descriptor, channel, options, settings)
+    new akka.grpc.internal.ScalaUnaryRequestBuilder(@{method.name}Descriptor, channel, options, settings)
   } else {
     @if(method.methodType == akka.grpc.gen.ServerStreaming) {
-    new ScalaServerStreamingRequestBuilder(@{method.name}Descriptor, channel, options, settings)
+    new akka.grpc.internal.ScalaServerStreamingRequestBuilder(@{method.name}Descriptor, channel, options, settings)
     } else if(method.methodType == akka.grpc.gen.ClientStreaming) {
-    new ScalaClientStreamingRequestBuilder(@{method.name}Descriptor, channel, options, settings)
+    new akka.grpc.internal.ScalaClientStreamingRequestBuilder(@{method.name}Descriptor, channel, options, settings)
     } else if (method.methodType == akka.grpc.gen.BidiStreaming) {
-    new ScalaBidirectionalStreamingRequestBuilder(@{method.name}Descriptor, channel, options, settings)
+    new akka.grpc.internal.ScalaBidirectionalStreamingRequestBuilder(@{method.name}Descriptor, channel, options, settings)
     }
   }
   }
@@ -75,10 +46,10 @@ final class Default@{service.name}Client(settings: GrpcClientSettings)(implicit 
    * prefer @{method.nameSafe}(@method.parameterType) if possible.
    */
   @if(method.methodType == akka.grpc.gen.Unary || method.methodType == akka.grpc.gen.ClientStreaming) {
-  override def @{method.nameSafe}(): SingleResponseRequestBuilder[@method.parameterType, @method.outputTypeUnboxed] =
+  override def @{method.nameSafe}(): akka.grpc.scaladsl.SingleResponseRequestBuilder[@method.parameterType, @method.outputTypeUnboxed] =
     @{method.name}RequestBuilder(clientState.internalChannel)
   } else {
-  override def @{method.nameSafe}(): StreamResponseRequestBuilder[@method.parameterType, @method.outputTypeUnboxed] =
+  override def @{method.nameSafe}(): akka.grpc.scaladsl.StreamResponseRequestBuilder[@method.parameterType, @method.outputTypeUnboxed] =
     @{method.name}RequestBuilder(clientState.internalChannel)
   }
 
@@ -94,14 +65,14 @@ final class Default@{service.name}Client(settings: GrpcClientSettings)(implicit 
 
 }
 
-@@AkkaGrpcGenerated
+@@akka.grpc.AkkaGrpcGenerated
 object Default@{service.name}Client {
 
-  def apply(settings: GrpcClientSettings)(implicit sys: ClassicActorSystemProvider): @{service.name}Client =
+  def apply(settings: akka.grpc.GrpcClientSettings)(implicit sys: akka.actor.ClassicActorSystemProvider): @{service.name}Client =
     new Default@{service.name}Client(settings)
 }
 
-@@AkkaGrpcGenerated
+@@akka.grpc.AkkaGrpcGenerated
 trait @{service.name}ClientPowerApi {
   @for(method <- service.methods) {
   /**
@@ -109,9 +80,9 @@ trait @{service.name}ClientPowerApi {
    * prefer @{method.nameSafe}(@method.parameterType) if possible.
    */
   @if(method.methodType == akka.grpc.gen.Unary || method.methodType == akka.grpc.gen.ClientStreaming) {
-  def @{method.nameSafe}(): SingleResponseRequestBuilder[@method.parameterType, @method.outputTypeUnboxed] = ???
+  def @{method.nameSafe}(): akka.grpc.scaladsl.SingleResponseRequestBuilder[@method.parameterType, @method.outputTypeUnboxed] = ???
   } else {
-  def @{method.nameSafe}(): StreamResponseRequestBuilder[@method.parameterType, @method.outputTypeUnboxed] = ???
+  def @{method.nameSafe}(): akka.grpc.scaladsl.StreamResponseRequestBuilder[@method.parameterType, @method.outputTypeUnboxed] = ???
   }
   }
 
